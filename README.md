@@ -1,10 +1,10 @@
 # ZoonoScope — The Zoonotic Risk Radar
 
-This project develops a "Zoonotic Risk Radar," a data-driven framework to identify high-risk species and trade routes within the global wildlife trade network. By fusing massive datasets from international trade, virology, and genetics, we build a predictive model using Graph Neural Networks (GNNs) to forecast potential hotspots for future zoonotic disease emergence.
+This project develops a "Zoonotic Risk Radar," a data-driven framework to identify high-risk species and trade routes within the global wildlife trade network. By fusing massive datasets from international trade, virology, and genetics, I built a predictive model using Graph Neural Networks (GNNs) to forecast potential hotspots for future zoonotic disease emergence.
 
 ## Project Overview
 
-The majority of emerging infectious diseases, including COVID-19 and Ebola, are zoonotic—originating in animals before spilling over to humans. The multi-billion-dollar global wildlife trade acts as a monstrously effective "pathogen highway," creating novel interfaces between remote ecosystems and dense human populations. However, this network is dangerously opaque. We lack a systematic map to understand which trade activities, involving which species, pose the greatest threat of sparking the next pandemic.
+The majority of emerging infectious diseases, including COVID-19 and Ebola, are zoonotic—originating in animals before spilling over to humans. The multi-billion-dollar global wildlife trade acts as a monstrously effective "pathogen highway," creating novel interfaces between remote ecosystems and dense human populations. However, this network is dangerously opaque. There is a lack of a systematic map to understand which trade activities, involving which species, pose the greatest threat of sparking the next pandemic.
 
 The methodology operates at the intersection of network science, epidemiology, and deep learning, involving a multi-stage pipeline to transform raw, disparate data into actionable risk intelligence.
 
@@ -14,16 +14,16 @@ The project is executed across a series of interconnected notebooks, each accomp
 
 ### Building the Pathogen Sharing Network
 
-Before analyzing trade, we first needed to understand which animals are known to share viruses. This forms the biological basis of our risk model.
+Before analyzing trade, I first needed to understand which animals are known to share viruses. This forms the biological basis of my risk model.
 
-*   **Data Sources:** We integrated data from ViralZone (to identify zoonotic virus families) and the VIRION database (a curated set of host-virus interactions from NCBI GenBank).
+*   **Data Sources:** I integrated data from ViralZone (to identify zoonotic virus families) and the VIRION database (a curated set of host-virus interactions from NCBI GenBank).
 
     * ViralZone Link - [Viralzone](https://www.ncbi.nlm.nih.gov/genbank/)
     * VIRION Link - [VIRION](https://viralzone.expasy.org/678)
   
 *   **Methodology:**
-    1.  We programmatically scraped and filtered a list of 15 key zoonotic virus families (e.g., *Coronaviridae*, *Filoviridae*).
-    2.  Using the VIRION dataset, we constructed a **pathogen-sharing network graph**, where each node is a host species and an edge exists if two species are known to be infected by the same virus.
+    1.  I programmatically scraped and filtered a list of 15 key zoonotic virus families (e.g., *Coronaviridae*, *Filoviridae*).
+    2.  Using the VIRION dataset, I constructed a **pathogen-sharing network graph**, where each node is a host species and an edge exists if two species are known to be infected by the same virus.
     3.  Network centrality measures (Degree, Betweenness, Eigenvector) were calculated for each host to quantify its importance in the pathogen-sharing landscape.
 *   **Key Results:**
     *   A dense pathogen-sharing graph was constructed with **1,885 unique host species** (nodes) and **279,297 connections** (edges).
@@ -46,7 +46,7 @@ Before analyzing trade, we first needed to understand which animals are known to
 ### Reconstructing the Global Wildlife Trade Network
 
 
-With an understanding of high-risk species, we turned to mapping the "highways" they travel on. This required processing the largest available dataset on the global wildlife trade.
+With an understanding of high-risk species, I turned to mapping the "highways" they travel on. This required processing the largest available dataset on the global wildlife trade.
 
 *   **Data Source:** The CITES (Convention on International Trade in Endangered Species) Trade Database, a massive and complex dataset.
     Link - [CITES Trade](https://trade.cites.org)
@@ -60,13 +60,11 @@ With an understanding of high-risk species, we turned to mapping the "highways" 
 *   **Key Results:**
     *   A global trade network of **256 countries** (nodes) and **8,197 trade routes** (edges) was constructed.
     *   Network analysis revealed that countries like the **United States, Switzerland, and France** are not only major traders but also critical intermediaries (high betweenness centrality), potentially acting as super-spreaders of risk.
-    *   By cross-referencing with the high-risk species list from Stage 1, we identified **~1.7 million trade records** involving potentially high-risk genera.
+    *   By cross-referencing with the high-risk species list from Stage 1, I identified **~1.7 million trade records** involving potentially high-risk genera.
 
 **Visualizations to Include Here:**
 
-![Top 15 Importing & Exporting Countries](images/top_15_import_export_countries.png "Bar Charts: Top 15 Importing & Exporting Countries")
-![Top 15 Traded Species and Animal Classes](images/top_15_traded_species_animal_classes.png "Bar Charts: Top 15 Traded Species and Animal Classes")
-![The Backbone of Global Wildlife Trade (Top 75 Routes)](images/network_graph_top_75_routes.png "Network Graph: The Backbone of Global Wildlife Trade (Top 75 Routes)")
+![Top 15 Importing & Exporting Countries](images/top_15_import_export_countries.png "Bar Charts: Top 15 Importing & Exporting Countries")![Top 15 Traded Species and Animal Classes](images/top_15_traded_species_animal_classes.png "Bar Charts: Top 15 Traded Species and Animal Classes")![The Backbone of Global Wildlife Trade (Top 75 Routes)](images/network_graph_top_75_routes.png "Network Graph: The Backbone of Global Wildlife Trade (Top 75 Routes)")
 ![Preliminary Wildlife Trade Risk Assessment Dashboard](images/preliminary_wildlife_trade_risk_dashboard.png "Dashboard Plot: Preliminary Wildlife Trade Risk Assessment Dashboard")
 
 
@@ -78,13 +76,13 @@ With an understanding of high-risk species, we turned to mapping the "highways" 
 This stage is the conceptual core of the project: fusing the biological, genetic, and trade data into a single, coherent feature set for each species.
 
 *   **Methodology:**
-    *   **Data Integration Challenge:** A significant challenge was linking species across datasets, which use different naming conventions. We implemented a **fuzzy string matching** algorithm to map species from the CITES trade data to our pathogen network. This was difficult, achieving a direct match for **9.7%** of traded species, highlighting the sparse data landscape.
-    *   **Trade Feature Engineering:** For each of the **6,153 unique species** in the CITES data, we engineered 10 features describing its trade profile (e.g., `total_quantity`, `num_importers`, `trade_diversity`).
-    *   **Genetic/Pathogen Feature Engineering:** For each species found in the pathogen network, we engineered 7 features based on its network properties (e.g., `pathogen_network_degree`, `clustering_coefficient`, `is_pathogen_hub`).
-    *   **Weak Supervision:** A key challenge in this domain is the lack of a ground-truth "spillover event" dataset. We created a proxy target variable using **weak supervision**. A species was labeled `high_risk (1)` if it was a major pathogen hub (top percentile in the pathogen network) or a known reservoir, and `low_risk (0)` otherwise. This resulted in an imbalanced dataset with **5.4% high-risk labels**.
+    *   **Data Integration Challenge:** A significant challenge was linking species across datasets, which use different naming conventions. I implemented a **fuzzy string matching** algorithm to map species from the CITES trade data to my pathogen network. This was difficult, achieving a direct match for **9.7%** of traded species, highlighting the sparse data landscape.
+    *   **Trade Feature Engineering:** For each of the **6,153 unique species** in the CITES data, I engineered 10 features describing its trade profile (e.g., `total_quantity`, `num_importers`, `trade_diversity`).
+    *   **Genetic/Pathogen Feature Engineering:** For each species found in the pathogen network, I engineered 7 features based on its network properties (e.g., `pathogen_network_degree`, `clustering_coefficient`, `is_pathogen_hub`).
+    *   **Weak Supervision:** A key challenge in this domain is the lack of a ground-truth "spillover event" dataset. I created a proxy target variable using **weak supervision**. A species was labeled `high_risk (1)` if it was a major pathogen hub (top percentile in the pathogen network) or a known reservoir, and `low_risk (0)` otherwise. This resulted in an imbalanced dataset with **5.4% high-risk labels**.
 *   **Key Results:**
     *   A final "master feature table" was created for **6,153 species**, containing 17 fused features from both trade and pathogen-sharing data.
-    *   **Data Coverage:** We found that only **8.5%** of traded species had available pathogen-sharing data, underscoring the critical data gaps in global biosurveillance.
+    *   **Data Coverage:** I found that only **8.5%** of traded species had available pathogen-sharing data, underscoring the critical data gaps in global biosurveillance.
     *   The feature `is_pathogen_hub` was assigned to 95 species, while `is_high_risk_reservoir` was assigned to 553 species based on network topology.
 
 
@@ -93,10 +91,10 @@ This stage is the conceptual core of the project: fusing the biological, genetic
 ### Predictive Modeling with Graph Neural Networks (GNN)
 
 
-To predict risk, we needed a model that could learn not just from a species' individual features but also from its relationship to other, similar species.
+To predict risk, I needed a model that could learn not just from a species' individual features but also from its relationship to other, similar species.
 
 *   **Methodology:**
-    1.  **Species Similarity Graph:** We constructed a new graph where nodes are species and edges connect species with similar feature profiles (based on cosine similarity of their feature vectors). This allows the model to learn from "peers."
+    1.  **Species Similarity Graph:** I constructed a new graph where nodes are species and edges connect species with similar feature profiles (based on cosine similarity of their feature vectors). This allows the model to learn from "peers."
     2.  **Model Architecture:** A two-layer **GraphSAGE** model (a type of Graph Neural Network) was implemented using PyTorch Geometric. This architecture is ideal as it learns by aggregating information from a node's local neighborhood in the graph, effectively capturing how risk might be shared among functionally similar species.
     3.  **Training:** The model was trained on 80% of the nodes to predict the weakly supervised high-risk label.
 *   **Key Results:**
@@ -106,8 +104,7 @@ To predict risk, we needed a model that could learn not just from a species' ind
 
 **Visualizations to Include Here:**
 
-![Top 30 Most Connected Species in Similarity Graph](images/top_30_connected_species.png "Network Graph: Top 30 Most Connected Species in Similarity Graph")
-![Confusion Matrix Plot](images/confusion_matrix.png "Confusion Matrix Plot")
+![Top 30 Most Connected Species in Similarity Graph](images/top_30_connected_species.png "Network Graph: Top 30 Most Connected Species in Similarity Graph")![Confusion Matrix Plot](images/confusion_matrix.png "Confusion Matrix Plot")
 
 
 ---
@@ -118,17 +115,16 @@ To predict risk, we needed a model that could learn not just from a species' ind
 The final stage involved using the trained model to generate the "Zoonotic Risk Radar" and, crucially, to understand *why* the model made its predictions.
 
 *   **Methodology:**
-    1.  **Inference:** The trained GNN was used to predict a **zoonotic risk probability score (from 0.0 to 1.0)** for all 6,153 species in our dataset.
-    2.  **Model Explanation:** We used **GNNExplainer**, a powerful explainability algorithm, to analyze the model's predictions. For each high-risk prediction, GNNExplainer identifies the most influential input features and neighboring nodes (i.e., the most important trade and biological connections).
+    1.  **Inference:** The trained GNN was used to predict a **zoonotic risk probability score (from 0.0 to 1.0)** for all 6,153 species in my dataset.
+    2.  **Model Explanation:** I used **GNNExplainer**, a powerful explainability algorithm, to analyze the model's predictions. For each high-risk prediction, GNNExplainer identifies the most influential input features and neighboring nodes (i.e., the most important trade and biological connections).
 *   **Final Results & Actionable Insights:**
     *   A final ranked list of species by zoonotic risk was generated. Top predicted high-risk species include **`Panthera leo` (Lion), `Panthera tigris` (Tiger), `Macaca mulatta` (Rhesus macaque), and `Ursus americanus` (American black bear)**.
     *   The risk distribution is highly skewed: **310 species (5.0%) were classified as "Critical Risk"** (probability > 0.8), representing a small but highly dangerous fraction of traded wildlife.
-    *   The GNNExplainer analysis provided insights into the drivers of risk, allowing us to identify not just high-risk species but also the critical trade connections between them that are most likely to facilitate pathogen flow.
+    *   The GNNExplainer analysis provided insights into the drivers of risk, allowing me to identify not just high-risk species but also the critical trade connections between them that are most likely to facilitate pathogen flow.
 
 **Visualizations to Include Here:**
 
-![Top 20 High-Risk Species and Risk Distribution Pie Chart](images/top_20_high_risk_species_pie_chart.png "Dashboard Plot: Top 20 High-Risk Species and Risk Distribution Pie Chart")
-![Zoonotic Risk Distribution(Histogram and Stats)](images/zoonotic_risk_distribution_histogram.png "Dashboard Plot: Distribution of Zoonotic Risk Scores")
+![Top 20 High-Risk Species and Risk Distribution Pie Chart](images/top_20_high_risk_species_pie_chart.png "Dashboard Plot: Top 20 High-Risk Species and Risk Distribution Pie Chart")![Zoonotic Risk Distribution(Histogram and Stats)](images/zoonotic_risk_distribution_histogram.png "Dashboard Plot: Distribution of Zoonotic Risk Scores")
 ![Distribution of Edge Importance in Trade Network](images/edge_importance_distribution.png "Dashboard Plot: Distribution of Edge Importance in Trade Network")
 
 
